@@ -1,61 +1,78 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Plus, Settings2 } from 'lucide-react'
 import { useItems } from '../db/repository'
-import { CATEGORIAS, type Categoria } from '../types'
-import { BlobImg, Cabecalho, Chip, Vazio, botao } from '../components/ui'
+import { CATEGORIAS, nomeCategoria, type Categoria } from '../types'
+import { Abas, BlobImg, Vazio, botao } from '../components/ui'
+
+const edicao = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).replace(' de ', ' · ')
 
 export function Armario() {
   const items = useItems()
   const [filtro, setFiltro] = useState<Categoria>()
 
   const lista = items?.filter((i) => !filtro || i.categoria === filtro) ?? []
-  const contagem = (c: Categoria) => items?.filter((i) => i.categoria === c).length ?? 0
+  const contagem = (c?: Categoria) => items?.filter((i) => !c || i.categoria === c).length ?? 0
+  const total = String(items?.length ?? 0).padStart(2, '0')
 
   return (
     <>
-      <Cabecalho
-        titulo="Meu armário"
-        direita={
-          <Link to="/ajustes" className="rounded-full p-2 text-xl" aria-label="Ajustes e backup">
-            ⚙️
+      {/* Masthead, como a capa de uma revista */}
+      <header className="px-4 pt-5">
+        <div className="flex items-center justify-between">
+          <span className="rotulo text-muted">Nº {total}</span>
+          <Link to="/ajustes" className="-mr-2 p-2" aria-label="Ajustes, aparência e backup">
+            <Settings2 size={20} strokeWidth={1.25} />
           </Link>
-        }
-      />
+        </div>
+        <h1 className="mt-1 text-center font-serif whitespace-nowrap text-[clamp(2rem,10.2vw,3.6rem)] font-medium uppercase leading-none tracking-[-0.03em]">
+          Guarda-Roupa
+        </h1>
+        <div className="rotulo mt-4 flex justify-between border-y border-ink py-2">
+          <span>Edição de {edicao}</span>
+          <span>
+            {total} {items?.length === 1 ? 'peça' : 'peças'}
+          </span>
+        </div>
+      </header>
+
       {items && items.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto px-4 py-3">
-          <Chip ativo={!filtro} onClick={() => setFiltro(undefined)}>
-            Todas ({items.length})
-          </Chip>
-          {CATEGORIAS.map((c) => (
-            <Chip key={c.id} ativo={filtro === c.id} onClick={() => setFiltro(filtro === c.id ? undefined : c.id)}>
-              {c.emoji} {c.nome} ({contagem(c.id)})
-            </Chip>
-          ))}
+        <div className="px-4">
+          <Abas
+            valor={filtro}
+            onChange={setFiltro}
+            opcoes={[
+              { id: undefined, nome: 'Todas' },
+              ...CATEGORIAS.filter((c) => contagem(c.id) > 0).map((c) => ({
+                id: c.id,
+                nome: c.nome,
+                extra: <sup className="ml-0.5 text-[8px]">{contagem(c.id)}</sup>,
+              })),
+            ]}
+          />
         </div>
       )}
 
       {items?.length === 0 && (
         <Vazio
-          emoji="📸"
-          titulo="Seu armário está vazio"
-          texto="Tire fotos das suas roupas para começar a montar looks."
+          titulo="Um armário em branco"
+          texto="Fotografe suas roupas sobre um fundo liso. Cada peça vira página desta revista, e as combinações vêm depois."
           acao={
             <Link to="/peca/nova" className={botao.primario}>
-              Adicionar primeira peça
+              Adicionar a primeira peça
             </Link>
           }
         />
       )}
 
-      <div className="grid grid-cols-3 gap-2 px-4">
+      <div className="grid grid-cols-3 gap-x-3 gap-y-6 px-4 pt-5">
         {lista.map((item) => (
-          <Link key={item.id} to={`/peca/${item.id}`} className="group relative aspect-square overflow-hidden rounded-xl bg-white shadow-sm">
-            <BlobImg blob={item.thumb} alt={item.nome} className="h-full w-full object-cover" />
-            {item.nome && (
-              <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/60 px-2 pb-1 pt-4 text-[11px] text-white">
-                {item.nome}
-              </span>
-            )}
+          <Link key={item.id} to={`/peca/${item.id}`} className="group">
+            <div className="aspect-[3/4] border border-line bg-surface transition-colors group-hover:border-ink">
+              <BlobImg blob={item.thumb} alt={item.nome} className="h-full w-full object-contain p-1.5" />
+            </div>
+            <p className="rotulo mt-2 text-[8.5px] text-muted">{nomeCategoria(item.categoria)}</p>
+            <p className="mt-0.5 truncate font-serif text-[15px] italic leading-snug">{item.nome || 'Sem nome'}</p>
           </Link>
         ))}
       </div>
@@ -63,9 +80,9 @@ export function Armario() {
       <Link
         to="/peca/nova"
         aria-label="Adicionar peça"
-        className="fixed bottom-24 right-[max(1rem,calc(50%-15rem))] z-20 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-3xl text-white shadow-lg active:bg-brand-700"
+        className="fixed bottom-24 right-[max(1rem,calc(50%-15rem))] z-20 flex h-14 w-14 items-center justify-center bg-ink text-bg shadow-[0_8px_24px_-8px_rgba(0,0,0,0.5)] transition-opacity hover:opacity-85"
       >
-        +
+        <Plus size={24} strokeWidth={1.25} />
       </Link>
     </>
   )

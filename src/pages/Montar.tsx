@@ -79,29 +79,20 @@ export function Montar() {
 
   return (
     <>
-      <Cabecalho
-        titulo={outfit ? outfit.nome : 'Montar look'}
-        esquerda={
-          id && (
-            <button onClick={() => navigate(-1)} className="-ml-2 rounded-full px-2 text-2xl" aria-label="Voltar">
-              ‹
-            </button>
-          )
-        }
-      />
+      <Cabecalho voltar={!!id} sobretitulo={outfit ? 'Look salvo' : 'Ateliê'} titulo={outfit ? outfit.nome : 'Montar look'} />
       <div className="flex flex-col gap-4 p-4">
         <div className="flex flex-wrap gap-2">
           <Chip ativo={!modoUnica} onClick={() => trocarModo(false)}>
-            👕+👖 Duas peças
+            Duas peças
           </Chip>
           <Chip ativo={modoUnica} onClick={() => trocarModo(true)}>
-            👗 Peça única
+            Peça única
           </Chip>
           <Chip ativo={casaco} onClick={() => setCasaco(!casaco)}>
-            🧥 Casaco
+            + Casaco
           </Chip>
           <Chip ativo={acessorio} onClick={() => setAcessorio(!acessorio)}>
-            👜 Acessório
+            + Acessório
           </Chip>
         </div>
 
@@ -112,7 +103,7 @@ export function Montar() {
           mostrarAcessorio={acessorio}
           onSlotClick={setEscolhendo}
         />
-        <p className="text-center text-xs text-slate-500">Toque em um espaço para escolher a peça</p>
+        <p className="text-center font-serif text-sm italic text-muted">Toque em um espaço para escolher a peça.</p>
 
         <button onClick={() => setSalvando(true)} disabled={visiveis.length === 0} className={botao.primario}>
           {outfit ? 'Salvar alterações' : 'Salvar look'}

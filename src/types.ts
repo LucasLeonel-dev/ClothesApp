@@ -25,17 +25,16 @@ export interface Outfit {
 /** Um look em montagem: no máximo uma peça por categoria. */
 export type Montagem = Partial<Record<Categoria, Item>>
 
-export const CATEGORIAS: { id: Categoria; nome: string; emoji: string }[] = [
-  { id: 'cima', nome: 'Parte de cima', emoji: '👕' },
-  { id: 'baixo', nome: 'Parte de baixo', emoji: '👖' },
-  { id: 'pecaUnica', nome: 'Peça única', emoji: '👗' },
-  { id: 'calcado', nome: 'Calçado', emoji: '👟' },
-  { id: 'casaco', nome: 'Casaco', emoji: '🧥' },
-  { id: 'acessorio', nome: 'Acessório', emoji: '👜' },
+export const CATEGORIAS: { id: Categoria; nome: string }[] = [
+  { id: 'cima', nome: 'Parte de cima' },
+  { id: 'baixo', nome: 'Parte de baixo' },
+  { id: 'pecaUnica', nome: 'Peça única' },
+  { id: 'calcado', nome: 'Calçado' },
+  { id: 'casaco', nome: 'Casaco' },
+  { id: 'acessorio', nome: 'Acessório' },
 ]
 
 export const nomeCategoria = (c: Categoria) => CATEGORIAS.find((x) => x.id === c)!.nome
-export const emojiCategoria = (c: Categoria) => CATEGORIAS.find((x) => x.id === c)!.emoji
 
 export const ESTACOES = ['Verão', 'Outono', 'Inverno', 'Primavera']
 export const OCASIOES = ['Casual', 'Trabalho', 'Festa', 'Esporte', 'Casa', 'Formal']
@@ -53,5 +52,4 @@ export const CORES: { nome: string; hex: string }[] = [
   { nome: 'Vermelho', hex: '#dc2626' },
   { nome: 'Rosa', hex: '#f472b6' },
   { nome: 'Roxo', hex: '#7c3aed' },
-  { nome: 'Estampado', hex: 'conic-gradient(#f472b6,#facc15,#2563eb,#16a34a,#f472b6)' },
 ]

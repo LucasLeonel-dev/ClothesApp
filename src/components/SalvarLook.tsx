@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ChipsMulti, Folha, botao } from './ui'
+import { ChipsMulti, Folha, Secao, botao, campo } from './ui'
 import { OCASIOES, ESTACOES } from '../types'
 
 interface Props {
@@ -28,22 +28,20 @@ export function SalvarLook({ aberta, nomeInicial = '', tagsIniciais = [], onFech
           e.preventDefault()
           onSalvar(nome.trim() || 'Look sem nome', tags)
         }}
-        className="flex flex-col gap-4"
+        className="flex flex-col gap-7"
       >
-        <label className="flex flex-col gap-1 text-sm font-medium">
-          Nome
+        <Secao titulo="Nome">
           <input
             autoFocus
             value={nome}
             onChange={(e) => setNome(e.target.value)}
             placeholder="Ex.: Sexta no escritório"
-            className="rounded-xl border border-slate-200 px-3 py-2.5 font-normal outline-brand-500"
+            className={`${campo} font-serif text-xl`}
           />
-        </label>
-        <div className="flex flex-col gap-2 text-sm font-medium">
-          Etiquetas
+        </Secao>
+        <Secao titulo="Etiquetas">
           <ChipsMulti opcoes={[...OCASIOES, ...ESTACOES]} valor={tags} onChange={setTags} />
-        </div>
+        </Secao>
         <button type="submit" className={botao.primario}>
           Salvar
         </button>

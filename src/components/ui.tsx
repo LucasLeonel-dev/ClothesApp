@@ -1,4 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { ChevronLeft, X } from 'lucide-react'
 
 /** Mostra uma imagem guardada como Blob no IndexedDB. */
 export function BlobImg({ blob, alt, className }: { blob?: Blob; alt: string; className?: string }) {
@@ -17,8 +19,9 @@ export function Chip({ ativo, onClick, children }: { ativo: boolean; onClick: ()
     <button
       type="button"
       onClick={onClick}
-      className={`shrink-0 rounded-full border px-3 py-1.5 text-sm transition ${
-        ativo ? 'border-brand-600 bg-brand-600 text-white' : 'border-slate-200 bg-white text-slate-700'
+      aria-pressed={ativo}
+      className={`rotulo inline-flex shrink-0 items-center gap-1.5 border px-3 py-2 transition-colors ${
+        ativo ? 'border-ink bg-ink text-bg' : 'border-line text-ink hover:border-ink'
       }`}
     >
       {children}
@@ -42,7 +45,7 @@ export function ChipsMulti({ opcoes, valor, onChange }: { opcoes: string[]; valo
 /** Lista de chips com seleção única, com opção "Qualquer". */
 export function ChipsUnico({ opcoes, valor, onChange }: { opcoes: string[]; valor?: string; onChange: (v?: string) => void }) {
   return (
-    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none]">
       <Chip ativo={!valor} onClick={() => onChange(undefined)}>
         Qualquer
       </Chip>
@@ -55,12 +58,57 @@ export function ChipsUnico({ opcoes, valor, onChange }: { opcoes: string[]; valo
   )
 }
 
-export function Cabecalho({ titulo, direita, esquerda }: { titulo: string; direita?: ReactNode; esquerda?: ReactNode }) {
+/** Abas de texto sublinhadas (filtros editoriais). */
+export function Abas<T extends string>({
+  opcoes,
+  valor,
+  onChange,
+}: {
+  opcoes: { id: T | undefined; nome: string; extra?: ReactNode }[]
+  valor: T | undefined
+  onChange: (v: T | undefined) => void
+}) {
   return (
-    <header className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b border-brand-100 bg-brand-50/90 px-4 backdrop-blur">
-      {esquerda}
-      <h1 className="flex-1 truncate text-lg font-semibold">{titulo}</h1>
-      {direita}
+    <div className="-mx-4 flex gap-5 overflow-x-auto border-b border-line px-4 [scrollbar-width:none]">
+      {opcoes.map((o) => {
+        const ativo = o.id === valor
+        return (
+          <button
+            key={o.id ?? 'todas'}
+            onClick={() => onChange(o.id)}
+            className={`rotulo -mb-px shrink-0 border-b py-3 transition-colors ${
+              ativo ? 'border-ink text-ink' : 'border-transparent text-muted hover:text-ink'
+            }`}
+          >
+            {o.nome}
+            {o.extra}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+export function Voltar() {
+  const navigate = useNavigate()
+  return (
+    <button onClick={() => navigate(-1)} className="-ml-2 p-2" aria-label="Voltar">
+      <ChevronLeft size={22} strokeWidth={1.25} />
+    </button>
+  )
+}
+
+export function Cabecalho({ titulo, sobretitulo, direita, voltar }: { titulo: string; sobretitulo?: string; direita?: ReactNode; voltar?: boolean }) {
+  return (
+    <header className="sticky top-0 z-10 border-b border-line bg-bg/95 px-4 pb-3 pt-4 backdrop-blur">
+      <div className="flex items-end gap-1">
+        {voltar && <Voltar />}
+        <div className="min-w-0 flex-1">
+          {sobretitulo && <p className="rotulo text-muted">{sobretitulo}</p>}
+          <h1 className="truncate font-serif text-[28px] leading-tight">{titulo}</h1>
+        </div>
+        {direita}
+      </div>
     </header>
   )
 }
@@ -68,15 +116,17 @@ export function Cabecalho({ titulo, direita, esquerda }: { titulo: string; direi
 export function Folha({ aberta, onFechar, titulo, children }: { aberta: boolean; onFechar: () => void; titulo: string; children: ReactNode }) {
   if (!aberta) return null
   return (
-    <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/40 sm:items-center" onClick={onFechar}>
+    <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/50 sm:items-center" onClick={onFechar}>
       <div
-        className="flex max-h-[85vh] w-full max-w-lg flex-col rounded-t-3xl bg-white sm:rounded-3xl"
+        role="dialog"
+        aria-label={titulo}
+        className="flex max-h-[85vh] w-full max-w-lg flex-col border-t border-line bg-surface sm:border"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3">
-          <h2 className="font-semibold">{titulo}</h2>
-          <button onClick={onFechar} className="rounded-full px-2 text-2xl leading-none text-slate-400" aria-label="Fechar">
-            ×
+        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+          <h2 className="font-serif text-xl italic">{titulo}</h2>
+          <button onClick={onFechar} className="-mr-2 p-2 text-muted hover:text-ink" aria-label="Fechar">
+            <X size={20} strokeWidth={1.25} />
           </button>
         </div>
         <div className="overflow-y-auto p-5">{children}</div>
@@ -85,19 +135,36 @@ export function Folha({ aberta, onFechar, titulo, children }: { aberta: boolean;
   )
 }
 
+const baseBotao = 'rotulo inline-flex items-center justify-center gap-2 px-5 py-4 transition-opacity disabled:opacity-35'
 export const botao = {
-  primario: 'rounded-2xl bg-brand-600 px-4 py-3 font-medium text-white shadow-sm active:bg-brand-700 disabled:opacity-50',
-  secundario: 'rounded-2xl border border-slate-200 bg-white px-4 py-3 font-medium text-slate-700 active:bg-slate-50 disabled:opacity-50',
-  perigo: 'rounded-2xl border border-red-200 bg-white px-4 py-3 font-medium text-red-600 active:bg-red-50',
+  primario: `${baseBotao} bg-ink text-bg hover:opacity-85`,
+  secundario: `${baseBotao} border border-ink text-ink hover:bg-ink hover:text-bg`,
+  perigo: `${baseBotao} border border-danger text-danger`,
+  texto: 'rotulo underline decoration-line underline-offset-4 hover:decoration-ink',
 }
 
-export function Vazio({ emoji, titulo, texto, acao }: { emoji: string; titulo: string; texto: string; acao?: ReactNode }) {
+/** Campo de texto editorial: só a linha de base. */
+export const campo = 'w-full border-b border-line bg-transparent py-2.5 text-[15px] outline-none transition-colors focus:border-ink'
+
+export function Secao({ titulo, dica, children }: { titulo: string; dica?: string; children: ReactNode }) {
   return (
-    <div className="flex flex-col items-center px-8 py-16 text-center">
-      <div className="mb-3 text-5xl">{emoji}</div>
-      <p className="font-semibold">{titulo}</p>
-      <p className="mt-1 text-sm text-slate-500">{texto}</p>
-      {acao && <div className="mt-5">{acao}</div>}
+    <section className="flex flex-col gap-3">
+      <div>
+        <h2 className="rotulo">{titulo}</h2>
+        {dica && <p className="mt-1 text-xs text-muted">{dica}</p>}
+      </div>
+      {children}
+    </section>
+  )
+}
+
+export function Vazio({ titulo, texto, acao }: { titulo: string; texto: string; acao?: ReactNode }) {
+  return (
+    <div className="flex flex-col items-center px-8 py-20 text-center">
+      <p className="font-serif text-3xl italic">{titulo}</p>
+      <div className="my-5 h-px w-10 bg-ink" />
+      <p className="max-w-xs text-sm leading-relaxed text-muted">{texto}</p>
+      {acao && <div className="mt-8 flex gap-2">{acao}</div>}
     </div>
   )
 }

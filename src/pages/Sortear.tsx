@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Bookmark, Dices, LockOpen } from 'lucide-react'
 import { novoId, salvarOutfit, useItems } from '../db/repository'
 import { sortearLook, type Filtros } from '../lib/randomizer'
 import { ESTACOES, OCASIOES, nomeCategoria, type Categoria, type Item, type Montagem } from '../types'
@@ -51,11 +52,10 @@ export function Sortear() {
   if (items?.length === 0)
     return (
       <>
-        <Cabecalho titulo="Sortear look" />
+        <Cabecalho sobretitulo="Ao acaso" titulo="Sortear look" />
         <Vazio
-          emoji="🎲"
           titulo="Nada para sortear ainda"
-          texto="Adicione algumas peças ao armário: pelo menos uma parte de cima, uma de baixo e um calçado."
+          texto="Adicione ao armário pelo menos uma parte de cima, uma de baixo e um calçado."
           acao={
             <Link to="/peca/nova" className={botao.primario}>
               Adicionar peça
@@ -69,24 +69,28 @@ export function Sortear() {
 
   return (
     <>
-      <Cabecalho titulo="Sortear look" />
+      <Cabecalho sobretitulo="Ao acaso" titulo="Sortear look" />
       <div className="flex flex-col gap-4 p-4">
-        <div className="flex flex-col gap-2">
-          <p className="text-sm font-semibold">Estação</p>
-          <ChipsUnico opcoes={ESTACOES} valor={filtros.estacao} onChange={(estacao) => setFiltros({ ...filtros, estacao })} />
-          <p className="mt-1 text-sm font-semibold">Ocasião</p>
-          <ChipsUnico opcoes={OCASIOES} valor={filtros.ocasiao} onChange={(ocasiao) => setFiltros({ ...filtros, ocasiao })} />
-          <div className="mt-1 flex gap-2">
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
+            <p className="rotulo text-muted">Estação</p>
+            <ChipsUnico opcoes={ESTACOES} valor={filtros.estacao} onChange={(estacao) => setFiltros({ ...filtros, estacao })} />
+          </div>
+          <div className="flex flex-col gap-2">
+            <p className="rotulo text-muted">Ocasião</p>
+            <ChipsUnico opcoes={OCASIOES} valor={filtros.ocasiao} onChange={(ocasiao) => setFiltros({ ...filtros, ocasiao })} />
+          </div>
+          <div className="flex gap-2">
             <Chip ativo={casaco} onClick={() => setCasaco(!casaco)}>
-              🧥 Incluir casaco
+              + Casaco
             </Chip>
             <Chip ativo={acessorio} onClick={() => setAcessorio(!acessorio)}>
-              👜 Incluir acessório
+              + Acessório
             </Chip>
           </div>
         </div>
 
-        <div className={`transition-opacity duration-200 ${girando ? 'opacity-40' : 'opacity-100'}`}>
+        <div className={`transition-opacity duration-200 ${girando ? 'opacity-30' : 'opacity-100'}`}>
           <OutfitBoard
             montagem={look}
             modoUnica={!!look.pecaUnica}
@@ -98,18 +102,21 @@ export function Sortear() {
         </div>
 
         {faltando.length > 0 && (
-          <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            Nenhuma peça encontrada para: {faltando.map(nomeCategoria).join(', ')}. Tente outros filtros ou adicione peças.
+          <p className="border-l border-danger pl-3 text-sm text-danger">
+            Nenhuma peça encontrada para {faltando.map(nomeCategoria).join(', ').toLowerCase()}. Tente outros filtros ou adicione peças.
           </p>
         )}
-        <p className="text-center text-xs text-slate-500">Toque no 🔓 para manter uma peça e sortear só o resto</p>
+        <p className="flex items-center justify-center gap-1.5 text-center font-serif text-sm italic text-muted">
+          Toque no <LockOpen size={13} strokeWidth={1.5} className="inline" /> para manter uma peça e sortear só o resto.
+        </p>
 
-        <div className="grid grid-cols-2 gap-2">
+        {/* Ações sempre visíveis acima da barra de navegação */}
+        <div className="sticky bottom-[78px] -mx-4 grid grid-cols-2 gap-2 bg-bg/95 px-4 py-2 backdrop-blur">
           <button onClick={sortear} className={botao.primario}>
-            🎲 Sortear
+            <Dices size={16} strokeWidth={1.25} /> Sortear
           </button>
           <button onClick={() => setSalvando(true)} disabled={Object.keys(look).length === 0} className={botao.secundario}>
-            ⭐ Salvar
+            <Bookmark size={15} strokeWidth={1.25} /> Salvar
           </button>
         </div>
       </div>

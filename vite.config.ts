@@ -10,12 +10,12 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Guarda-Roupa Virtual',
+        name: 'Guarda-Roupa',
         short_name: 'Guarda-Roupa',
         description: 'Seu armário online para montar looks',
         lang: 'pt-BR',
-        theme_color: '#7c3aed',
-        background_color: '#faf7ff',
+        theme_color: '#0a0a0a',
+        background_color: '#fafaf8',
         display: 'standalone',
         start_url: '/',
         icons: [{ src: 'icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' }],

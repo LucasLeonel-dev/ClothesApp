@@ -1,14 +1,57 @@
 @import "tailwindcss";
 
-@theme {
-  --color-brand-50: #faf7ff;
-  --color-brand-100: #ede9fe;
-  --color-brand-500: #8b5cf6;
-  --color-brand-600: #7c3aed;
-  --color-brand-700: #6d28d9;
+/* O tema escuro é controlado por data-theme no <html> (ver src/lib/theme.ts) */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+:root {
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --ink: #0a0a0a;
+  --muted: #6e6a63;
+  --line: #e4e1da;
+  --danger: #8c1d1d;
+  color-scheme: light;
 }
 
-body {
-  @apply bg-brand-50 text-slate-800 antialiased;
-  -webkit-tap-highlight-color: transparent;
+:root[data-theme='dark'] {
+  --bg: #0a0a0a;
+  --surface: #151514;
+  --ink: #fafaf8;
+  --muted: #9a958c;
+  --line: #2a2926;
+  --danger: #e07a7a;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-danger: var(--danger);
+  --font-serif: 'Bodoni Moda', 'Didot', 'Bodoni 72', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+/* Rótulo editorial: caixa alta pequena e espaçada */
+@utility rotulo {
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+@layer base {
+  body {
+    @apply bg-bg font-sans text-ink antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+  ::selection {
+    @apply bg-ink text-bg;
+  }
+  input::placeholder {
+    @apply text-muted;
+  }
 }

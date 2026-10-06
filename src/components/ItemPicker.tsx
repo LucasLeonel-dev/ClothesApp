@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useItems } from '../db/repository'
 import type { Categoria, Item } from '../types'
 import { nomeCategoria } from '../types'
-import { BlobImg, Folha } from './ui'
+import { BlobImg, Folha, botao } from './ui'
 
 interface Props {
   categoria?: Categoria
@@ -19,29 +19,28 @@ export function ItemPicker({ categoria, selecionado, onEscolher, onFechar }: Pro
   return (
     <Folha aberta={!!categoria} onFechar={onFechar} titulo={categoria ? nomeCategoria(categoria) : ''}>
       {lista.length === 0 ? (
-        <p className="py-6 text-center text-sm text-slate-500">
-          Você ainda não tem peças nesta categoria.{' '}
-          <Link to="/peca/nova" className="font-medium text-brand-600">
-            Adicionar
+        <div className="flex flex-col items-center gap-5 py-6 text-center">
+          <p className="text-sm text-muted">Você ainda não tem peças nesta categoria.</p>
+          <Link to="/peca/nova" className={botao.secundario}>
+            Adicionar peça
           </Link>
-        </p>
+        </div>
       ) : (
         <div className="grid grid-cols-3 gap-2">
           {lista.map((item) => (
             <button
               key={item.id}
               onClick={() => onEscolher(item)}
-              className={`aspect-square overflow-hidden rounded-xl border-2 bg-slate-50 ${
-                selecionado?.id === item.id ? 'border-brand-600' : 'border-transparent'
-              }`}
+              aria-pressed={selecionado?.id === item.id}
+              className={`aspect-[3/4] border bg-bg ${selecionado?.id === item.id ? 'border-ink' : 'border-line'}`}
             >
-              <BlobImg blob={item.thumb} alt={item.nome} className="h-full w-full object-cover" />
+              <BlobImg blob={item.thumb} alt={item.nome} className="h-full w-full object-contain p-1.5" />
             </button>
           ))}
         </div>
       )}
       {selecionado && (
-        <button onClick={() => onEscolher(undefined)} className="mt-4 w-full py-2 text-sm text-red-600">
+        <button onClick={() => onEscolher(undefined)} className={`${botao.texto} mt-6 w-full text-center text-danger`}>
           Remover peça do look
         </button>
       )}
